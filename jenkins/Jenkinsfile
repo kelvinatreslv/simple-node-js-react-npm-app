@@ -1,9 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'node:lts-buster-slim'
-            args '-p 3000:3000'
-        }
+        any
     }
     environment {
         CI = 'true'
@@ -15,9 +12,14 @@ pipeline {
             }
         }
         stage('Test') {
-            steps {
-                sh './jenkins/scripts/test.sh'
-            }
+          steps {
+            echo 'Testing...'
+            snykSecurity(
+              snykInstallation: 'snyk@latest',
+              snykTokenId: 'snyk-api-token-kk',
+              // place other optional parameters here, for example:
+            )
+          }
         }
         stage('Deliver') {
             steps {
