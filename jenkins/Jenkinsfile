@@ -12,8 +12,11 @@ pipeline {
             echo 'Testing...'
             sh 'pwd'
             sh 'ls -la'
+            sh 'snyk auth ${snyk-api-token-kk}'
+            echo 'start snyk code test...'
             sh '/opt/jenkins/tools/snyk/snyk-linux code test'
-            sh 'start snyk test'
+            
+            echo  'start snyk test'
 
             snykSecurity(
               snykInstallation: 'snyk@manual',
