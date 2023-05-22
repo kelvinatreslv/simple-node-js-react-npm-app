@@ -2,12 +2,8 @@ pipeline {
     agent any
     tools {nodejs "nodejs-20.2.0"}
     stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
+
+        stage('static code scan') {
           steps {
             echo 'Testing...'
             sh 'pwd'
@@ -27,16 +23,31 @@ pipeline {
                         }
             recordIssues  tool: sarif(name: 'Snyk Code', id: 'snyk-code', pattern: 'results-code.sarif')
 
-            // echo  'start snyk test'
 
-            // snykSecurity(
-            //   snykInstallation: 'snyk@manual',
-            //   // snykInstallation: 'snyk@latest',
-            //   snykTokenId: 'snyk-api-token-kk',
-            //   // place other optional parameters here, for example:
-            // )
           }
         }
+
+        stage('Build') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Vulnerability Scan') {
+            steps {
+            echo  'start snyk test...'
+            snykSecurity(
+              snykInstallation: 'snyk@latest...',
+              // snykInstallation: 'snyk@latest',
+              snykTokenId: 'snyk-api-token-kk',
+              // place other optional parameters here, for example:
+            )
+            }
+        }
+
+
+
+
         stage('Deliver') {
             steps {
                 sh './jenkins/scripts/deliver.sh'
