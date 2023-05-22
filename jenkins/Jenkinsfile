@@ -13,11 +13,11 @@ pipeline {
             sh 'pwd'
             sh 'ls -la'
             echo 'Authorize Snyk CLI'
-            sh 'echo NYK_TOKEN is  ${SNYK_TOKEN}'
+            sh 'echo NYK_TOKEN is  ${SNYK_TOKEN_SECRET}'
             sh 'echo snyk-api-token-kk is ${snyk-api-token-kk}'
             // sh '/opt/jenkins/tools/snyk/snyk-linux auth ${snyk-api-token-kk}'
-              withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
-                    sh 'snyk auth ${SNYK_TOKEN}'
+              withCredentials([string(credentialsId: 'SNYK_TOKEN_SECRET', variable: 'SNYK_TOKEN_SECRET')]) {
+                    sh 'snyk auth ${SNYK_TOKEN_SECRET}'
                 }
 
 
