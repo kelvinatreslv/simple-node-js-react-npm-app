@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    tools {nodejs "nodejs-20.2.0"}
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Test') {
+          steps {
+            echo 'Testing...'
+            sh 'pwd'
+            sh 'ls -la'
+            echo 'Authorize Snyk CLI'
+
+            withCredentials([string(credentialsId: 'SNYK_TOKEN_SECRET', variable: 'SNYK_TOKEN_SECRET')]) {
+              sh 'snyk auth ${SNYK_TOKEN_SECRET}'
+            }
+
+
+            echo 'start snyk code test...'
+            // sh '/opt/jenkins/tools/snyk/snyk-linux code test'
+            
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            sh '/opt/jenkins/tools/snyk/snyk-linux code test --sarif-file-output=results-code.sarif'
+                        }
+            recordIssues  tool: sarif(name: 'Snyk Code', id: 'snyk-code', pattern: 'results-code.sarif')
+
+            // echo  'start snyk test'
+
+            // snykSecurity(
+            //   snykInstallation: 'snyk@manual',
+            //   // snykInstallation: 'snyk@latest',
+            //   snykTokenId: 'snyk-api-token-kk',
+            //   // place other optional parameters here, for example:
+            // )
+          }
+        }
+        stage('Deliver') {
+            steps {
+                sh './jenkins/scripts/deliver.sh'
+                input message: 'Finished using the web site? (Click "Proceed" to continue)'
+                sh './jenkins/scripts/kill.sh'
+            }
+        }
+    }
+}
