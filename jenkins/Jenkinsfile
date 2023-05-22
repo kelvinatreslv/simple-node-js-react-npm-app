@@ -10,6 +10,11 @@ pipeline {
         stage('Test') {
           steps {
             echo 'Testing...'
+            sh 'pwd'
+            sh 'ls -la'
+            sh '/opt/jenkins/tools/snyk/snyk-linux code test'
+            sh 'start snyk test'
+
             snykSecurity(
               snykInstallation: 'snyk@manual',
               // snykInstallation: 'snyk@latest',
